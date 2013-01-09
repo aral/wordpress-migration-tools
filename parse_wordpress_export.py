@@ -55,7 +55,7 @@
 #   comments            (Array) of Comment objects.
 #
 
-import xml.etree.ElementTree as ET
+import lxml.etree.ElementTree as ET
 
 # Options
 verbose = False
