@@ -39,7 +39,7 @@ for comment in post['comments']:
     if comment['approved'] == '1':
         li = u'<li>';
         li += comment['content']
-        li += u' <em>by ' + comment['author'] + u' on ' + comment['date'] + u'</em>'
+        li += u'\n<p class="byline">by ' + comment['author'] + u' on ' + comment['date'] + u'</p>'
         li += u'</li>'
         commentsUL += '\n\t\t' + li
     else:
@@ -85,6 +85,7 @@ html = u"""
             %s
             </section>
             <section id="comments">
+            <h3>Comments</h3>
             %s
             </section>
         </div>
