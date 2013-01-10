@@ -154,11 +154,24 @@ for post in wp.postsPublished:
             if comment['approved'] == '1':
                 li = u'<li>'
                 li += comment['content']
-                li += u'\n<p class="byline">by ' + comment['author'] + u' on ' + comment['date'] + u'</p>'
+
+                commentAuthor = 'Anonymous'
+                if comment['author'] != None:
+                    commentAuthor = comment['author']
+                else:
+                    print 'Unknown author in comment on post with id: ' + post['id']
+
+                # commentDate = 'an unknown date'
+                # if comment['date'] != None:
+                #     commentDate = comment['date']
+                # else:
+                #     print 'Unknown date in comment on post with id: ' + post['id']
+
+                li += u'\n<p class="byline">by ' + commentAuthor + u' on ' + comment['date'] + u'</p>'
                 li += u'</li>'
                 commentsUL += '\n\t\t' + li
-            else:
-                print 'Skipping unapproved comment.'
+            # else:
+            #     print 'Skipping unapproved comment.'
 
         commentsUL += '\n</ul>\n</section>\n'
 
@@ -283,7 +296,23 @@ for post in wp.postsPublished:
     #
     # Add this post to the index post list for the archive’s index.
     #
-    indexListItem = u'\t\t\t\t<li><a href="/' + post['id'] + u'/">' + post['title'] + u'</a>&#8202;—&#8202;' + post['date'] + u'</li>\n'
+    indexListItem = u'\t\t\t\t<li><a href="/' + post['id'] + u'/">'
+
+    if post['title'] != None:
+        indexListItem += post['title']
+    else:
+        indexListItem += 'Untitled'
+        print 'Warning: post with id %s is missing post title.' % post['id']
+
+    indexListItem += u'</a>'
+
+    # Post date may be None, check for this.
+    if post['date'] != None:
+        indexListItem += u'&#8202;—&#8202;' + post['date']
+    else:
+        print 'Warning: post with id %s is missing post date.' % post['id']
+
+    indexListItem += u'</li>\n'
 
     indexPostListHTML += indexListItem
 
