@@ -6,9 +6,9 @@
 #
 # Content tests:
 #
-#   1269    <pre> tags, <p> wrapping
-#   2       <br><br> tag stripping
-#
+#   1269                            <pre> tags, <p> wrapping
+#   2                               <br><br> tag stripping
+#   1951    publishedPosts[1000]    Extra space at the top of <pre>, lack of <p> after pre
 
 import argparse
 import os
@@ -199,11 +199,11 @@ for post in wp.postsPublished:
     # to do with it whatsoever. :)
     #
 
-    # 1. Remove any occurances of <br><br>. Seriously, there’s never a need for that.
+    # * Remove any occurances of <br><br>. Seriously, there’s never a need for that.
 
-    # 2. Read through the content line by line and wrap <p> tags around
-    #    all the paragraphs. (Reading line by line makes it easier to avoid
-    #    adding <p> tags within <pre>formatted text, etc.)
+    # * Read through the content line by line and wrap <p> tags around
+    #   all the paragraphs. (Reading line by line makes it easier to avoid
+    #   adding <p> tags within <pre>formatted text, etc.)
 
     massagedContent = '<p>'
     lastLine = ''
@@ -223,6 +223,13 @@ for post in wp.postsPublished:
             line = line.replace('>', '&gt;')
         if '<pre' in line:
             inPreformattedText = True
+
+            # If the preformatted text starts with an empty line,
+            # remove it so that there isn’t too much whitespace at the top.
+            # Test with post 1269 (postsPublished[1000])
+            if line[-1] == '\n':
+                line = line[:-1]
+
             # Debug: Using post 1269 to test the escaping of angular tags in
             # ====== preformatted text.
             # if post['id'] == '1269':
