@@ -220,7 +220,7 @@ for post in wp.postsPublished:
         currentIndexYear = len(indexYears)
 
         currentYearDictionary = {}
-        currentYearDictionary['header'] = '<h3 id="%s">%s</h3>' % (year, year)
+        currentYearDictionary['header'] = u'<h3 id="%s">%s<a href="#year-nav"><span class="return-link">↩</span></a></h3>' % (year, year)
         currentYearDictionary['posts'] = []
 
         indexYears.append(currentYearDictionary)
@@ -247,7 +247,7 @@ print '\nCreating the index…\n'
 # Reverse the years and the posts within the years
 # to create the index in reverse chronological order.
 
-indexPostListHTML = '<div>Years: <small>|</small> '
+indexPostListHTML = '<div id="year-nav">Years: <small>|</small> '
 
 # Add links to the year anchors
 
