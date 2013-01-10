@@ -220,7 +220,7 @@ for post in wp.postsPublished:
         currentIndexYear = len(indexYears)
 
         currentYearDictionary = {}
-        currentYearDictionary['header'] = '<h3>%s</h3>' % year
+        currentYearDictionary['header'] = '<h3 id="%s">%s</h3>' % (year, year)
         currentYearDictionary['posts'] = []
 
         indexYears.append(currentYearDictionary)
@@ -229,7 +229,7 @@ for post in wp.postsPublished:
 
     # Post date may be None, check for this.
     if post['date'] != None:
-        indexListItem += u'&#8202;—&#8202;' + post['date']
+        indexListItem += u'<small>&#8202;—&#8202;' + post['date'].split(' ')[0] + '</small>'
     else:
         print '\tWarning: post with id %s is missing post date.' % post['id']
 
@@ -247,11 +247,18 @@ print '\nCreating the index…\n'
 # Reverse the years and the posts within the years
 # to create the index in reverse chronological order.
 
-indexPostListHTML = ''
+indexPostListHTML = '<div>Years: <small>|</small> '
+
+# Add links to the year anchors
+
+coveredYears.reverse()
+for year in coveredYears:
+    indexPostListHTML += '<a href="#%s">%s</a> <small>|</small> ' % (year, year)
+
+indexPostListHTML += '</div>\n'
 
 indexYears.reverse()
 for indexYear in indexYears:
-    print 'Creating index for year ' + indexYear['header']
     indexPostListHTML += indexYear['header'] + '\n'
     indexPostListHTML += '<ul>\n'
     indexYear['posts'].reverse()
