@@ -9,6 +9,7 @@
 #   1269                            <pre> tags, <p> wrapping
 #   2                               <br><br> tag stripping
 #   1951    publishedPosts[1000]    Extra space at the top of <pre>, lack of <p> after pre
+#   880                             [as]…[/as] short‐codes to <pre>
 
 import argparse
 import os
@@ -211,8 +212,13 @@ for post in wp.postsPublished:
     buffer = StringIO.StringIO(post['content'])
     line = buffer.readline()
     while line:
-        if '</pre' in line:
+        if '</pre' in line or '[/as]' in line:
             inPreformattedText = False
+
+            if '[/as]' in line:
+                # Replace the [/as] shortcode with a </pre>
+                line = line.replace('[/as]', '</pre>')
+
             # Debug: Using post 1269 to test the escaping of angular tags in
             # ====== preformatted text.
             # if post['id'] == '1269':
@@ -221,8 +227,13 @@ for post in wp.postsPublished:
             # The crappy exported data doesn’t even escape angular brackets!
             line = line.replace('<', '&lt;')
             line = line.replace('>', '&gt;')
-        if '<pre' in line:
+        if '<pre' in line or '[as]' in line:
             inPreformattedText = True
+
+            if '[as]' in line:
+                # Replace the [as] shortcode with a <pre>
+                # Test with post 880.
+                line = line.replace('[as]', '<pre>')
 
             # If the preformatted text starts with an empty line,
             # remove it so that there isn’t too much whitespace at the top.
