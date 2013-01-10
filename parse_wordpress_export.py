@@ -16,8 +16,8 @@
 #   Posts, pages, and attachments are all item dictionaries.
 #
 #
-#   Item dictionary attributes
-#   --------------------------
+#   Item dictionary keys
+#   --------------------
 #
 #   e.g., post = postsPublished[0]      <-- Returns an item dictionary.
 #         postTitle = post['title']
@@ -52,10 +52,15 @@
 #                           'slug':   category slug
 #                           'name':   category display name
 #
-#   comments            (Array) of Comment objects.
+#   comments            (Array) of Comment dictionaries.
 #
+#
+#   Comment dictionary keys:
+#   ------------------------
+#
+#   TODO
 
-import lxml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET
 
 # Options
 verbose = False
@@ -176,7 +181,29 @@ def parse():
         else:
             post['category'] = None
 
-        post['comments'] = postElement.findall(ns3Comment)
+        # Comments
+        commentElements = postElement.findall(ns3Comment)
+
+        comments = []
+
+        for commentElement in commentElements:
+            comment = {}
+
+            comment['id'] = commentElement.find(ns3CommentID).text
+            comment['author'] = commentElement.find(ns3CommentAuthor).text
+            comment['authorEmail'] = commentElement.find(ns3CommentAuthorEmail).text
+            comment['authorURL'] = commentElement.find(ns3CommentAuthorURL).text
+            # Author IP may be None. TODO: Handle this.
+            # comment['authorIP'] = commentElement.find(ns3CommentAuthorIP).text
+            comment['date'] = commentElement.find(ns3CommentDateGMT).text
+            comment['content'] = commentElement.find(ns3CommentContent).text
+            comment['approved'] = commentElement.find(ns3CommentApproved).text
+            comment['type'] = commentElement.find(ns3CommentType).text
+            comment['parent'] = commentElement.find(ns3CommentType).text
+
+            comments.append(comment)
+
+        post['comments'] = comments
 
         # To see what status types we have (good for the future and for other people
         # who might use this script if new ones crop up)…

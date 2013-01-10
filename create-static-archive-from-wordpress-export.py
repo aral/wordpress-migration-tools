@@ -24,7 +24,23 @@ wp.parse()
 
 post = wp.postsPublished[0]
 
-html = """
+commentsUL = u"""
+    <!-- Comments -->
+    <ul>
+"""
+
+for comment in post['comments']:
+    # Only include approved comments.
+    if comment['approved'] == '1':
+        li = u'<li>';
+        li += comment['content']
+        li += u' <em>by ' + comment['author'] + u' on ' + comment['date'] + u'</em>'
+        li += u'</li>'
+        commentsUL += '\n\t\t' + li
+    else:
+        print 'Skipping unapproved comment.'
+
+html = u"""
 <html>
     <head>
         <meta charset="utf-8">
@@ -33,9 +49,13 @@ html = """
         <link rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
         <title>Aral Balkan: Historic Archive&#8202;—&#8202;%s</title>
     </head>
-    <h1>%s</h1>
-    <body>%s</body>
+    <body>
+        <h1>%s</h1>
+        %s
+        <hr>
+        %s
+    </body>
 </html>
-""" % (post['title'], post['title'], post['content'])
+""" % (post['title'], post['title'], post['content'], commentsUL)
 
 print html
