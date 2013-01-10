@@ -1,1 +1,4 @@
 aralbalkan.wordpress.2013-01-08.xml
+build/
+*.pyc
+.DS_Store
