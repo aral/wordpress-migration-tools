@@ -244,6 +244,7 @@ for post in wp.postsPublished:
             # If the preformatted text starts with an empty line,
             # remove it so that there isn’t too much whitespace at the top.
             # Test with post 1269 (postsPublished[1000])
+            # and post 1030 (postsPublished[838])
             if line[-2:] == '>\n':
                 line = line[:-1]
 
