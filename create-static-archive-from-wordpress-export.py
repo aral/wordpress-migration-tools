@@ -1,4 +1,15 @@
 # -*- coding: utf-8 -*-
+
+#
+# This is the script that actually generates my archive. I intend to make it a bit
+# more generic in the future but right now it is mostly hard‐coded for my own needs.
+#
+# Content tests:
+#
+#   1269    <pre> tags, <p> wrapping
+#   2       <br><br> tag stripping
+#
+
 import argparse
 import os
 import parse_wordpress_export
@@ -53,7 +64,7 @@ indexHeaderHTML = u"""
         </nav>
 
         <section id="archiveDisclaimer">
-            <p><strong>Historic content:</strong> You are viewing the archives of the old WordPress blog that used to be on this site. The archive has over 1,500 articles that I wrote over a ten year period. The formatting and contents of the posts may not display perfectly.</p>
+            <strong>Historical content:</strong> You are viewing the archives of the old WordPress blog that used to be on this site. The archive has close to 1,600 articles that I wrote over a ten year period. The archive was automatically generated from a WordPress export XML file (WXR) using <a href="https://github.com/aral/wordpress-migration-tools">some custom Python code I wrote</a> so the formatting and contents of the posts may not display perfectly.
         </section>
 
         <div role="content">
@@ -257,7 +268,7 @@ for post in wp.postsPublished:
             </nav>
 
             <section id="archiveDisclaimer">
-                <strong>Historical content: This article was written over %s</strong> on %s. You are viewing an archived post written from the old WordPress blog I had at this site. The archive has over 1,500 articles that I wrote over a ten year period. The formatting and contents of the posts may not display perfectly.
+                <strong>Historical content:</strong> I wrote this article over %s on %s. You are viewing an archived post I wrote on my old WordPress blog. The archive contains over 1,500 articles written over a ten year period. The formatting and contents of the posts may not display perfectly.
             </section>
 
             <div role="content">
@@ -329,7 +340,7 @@ for post in wp.postsPublished:
             </script>
         </body>
     </html>
-    """ % (post['title'], post['title'], ageOfPost, post['date'], post['title'], post['content'], commentsUL, post['title'])
+    """ % (post['title'], post['title'], ageOfPost, post['date'].split(' ')[0], post['title'], post['content'], commentsUL, post['title'])
 
     # print html
 
