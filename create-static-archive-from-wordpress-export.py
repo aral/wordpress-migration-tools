@@ -223,6 +223,11 @@ for post in wp.postsPublished:
                 print 'Entering preformatted text in line: ' + line
 
         if not inPreformattedText:
+            if line == '<br />\n':
+                # Remove  <br> tag and wrap the last line in a paragraph
+                lastLine = '<p>' + lastLine.replace('<br />\n', '') + '</p>'
+                # And remove the current <br> tag too.
+                line = ''
             if line == '\n':
                 if len(lastLine) > 0 and lastLine[-1] == '\n':
                     lastLine += '</p><p>'
@@ -231,6 +236,9 @@ for post in wp.postsPublished:
         line = buffer.readline()
 
     massagedContent += lastLine + '</p>'
+
+    # Remove any single <br> tags that we might have missed.
+    massagedContent = massagedContent.replace('<br />', '')
 
     post['content'] = massagedContent
 
