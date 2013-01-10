@@ -268,7 +268,7 @@ for post in wp.postsPublished:
             </nav>
 
             <section id="archiveDisclaimer">
-                <strong>Historical content:</strong> I wrote this article over %s on %s. You are viewing an archived post I wrote on my old WordPress blog. The archive contains over 1,500 articles written over a ten year period. The formatting and contents of the posts may not display perfectly.
+                <strong>Historical content:</strong> I wrote this article over %s on %s. You are viewing an archived post from my old WordPress blog. The archive contains over 1,500 articles written over a ten year period. The formatting and contents of the posts may not display perfectly.
             </section>
 
             <div role="content">
