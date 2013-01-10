@@ -10,6 +10,8 @@
 #   2                               <br><br> tag stripping
 #   1951    publishedPosts[1000]    Extra space at the top of <pre>, lack of <p> after pre
 #   880                             [as]…[/as] short‐codes to <pre>
+#   1030    publishedPosts[838]     <pre> with multiple \n’s that can get erroneously
+#                                   stripped out by code to strip out first \n <pre>s
 
 import argparse
 import os
@@ -242,7 +244,7 @@ for post in wp.postsPublished:
             # If the preformatted text starts with an empty line,
             # remove it so that there isn’t too much whitespace at the top.
             # Test with post 1269 (postsPublished[1000])
-            if line[-1] == '\n':
+            if line[-2:] == '>\n':
                 line = line[:-1]
 
             # Debug: Using post 1269 to test the escaping of angular tags in
