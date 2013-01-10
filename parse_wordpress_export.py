@@ -132,7 +132,7 @@ def parse():
     wordpressExportTree = ET.parse('aralbalkan.wordpress.2013-01-08.xml')
     root = wordpressExportTree.getroot()
 
-    print 'Done.'
+    print 'Done.\n'
 
     channel = root.find('channel')
     items = channel.findall('item')

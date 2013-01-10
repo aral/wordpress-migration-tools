@@ -28,13 +28,15 @@ parser.add_argument('wordpressExportFile')
 parser.add_argument('--verbose')
 args = parser.parse_args()
 
-print '\nCreating static archive from WordPress export file:' \
+print '\nCreate static archive from WordPress export file:' \
     '\n➤ %s\n' % args.wordpressExportFile
 
 
 # Generate a static pages
 
 wp.parse()
+
+print '\nCreating the posts…\n'
 
 #
 # Archive index template
@@ -173,7 +175,7 @@ for post in wp.postsPublished:
                 if comment['author'] != None:
                     commentAuthor = comment['author']
                 else:
-                    print 'Unknown author in comment on post with id: ' + post['id']
+                    print '\tInfo: Unknown author in comment on post with id: %s.' % post['id']
 
                 # commentDate = 'an unknown date'
                 # if comment['date'] != None:
@@ -211,16 +213,20 @@ for post in wp.postsPublished:
     while line:
         if '</pre' in line:
             inPreformattedText = False
-            if post['id'] == '1269':
-                print 'Exiting preformatted text in line: ' + line
+            # Debug: Using post 1269 to test the escaping of angular tags in
+            # ====== preformatted text.
+            # if post['id'] == '1269':
+            #     print 'Exiting preformatted text in line: ' + line
         if inPreformattedText:
             # The crappy exported data doesn’t even escape angular brackets!
             line = line.replace('<', '&lt;')
             line = line.replace('>', '&gt;')
         if '<pre' in line:
             inPreformattedText = True
-            if post['id'] == '1269':
-                print 'Entering preformatted text in line: ' + line
+            # Debug: Using post 1269 to test the escaping of angular tags in
+            # ====== preformatted text.
+            # if post['id'] == '1269':
+            #     print 'Entering preformatted text in line: ' + line
 
         if not inPreformattedText:
             if line == '<br />\n':
@@ -373,7 +379,7 @@ for post in wp.postsPublished:
         indexListItem += post['title']
     else:
         indexListItem += 'Untitled'
-        print 'Warning: post with id %s is missing post title.' % post['id']
+        print '\tWarning: post with id %s is missing post title.' % post['id']
 
     indexListItem += u'</a>'
 
@@ -381,7 +387,7 @@ for post in wp.postsPublished:
     if post['date'] != None:
         indexListItem += u'&#8202;—&#8202;' + post['date']
     else:
-        print 'Warning: post with id %s is missing post date.' % post['id']
+        print '\tWarning: post with id %s is missing post date.' % post['id']
 
     indexListItem += u'</li>\n'
 
@@ -390,6 +396,8 @@ for post in wp.postsPublished:
 #
 # Create and write out the index file
 #
+
+print '\nCreating the index…\n'
 
 archiveIndexHTML = indexHeaderHTML + indexPostListHTML + indexFooterHTML
 
@@ -402,4 +410,5 @@ file = open(archiveFilePath, 'w')
 file.write(archiveIndexHTML.encode('utf8', 'replace'))
 file.close()
 
+print 'Ready.'
 
