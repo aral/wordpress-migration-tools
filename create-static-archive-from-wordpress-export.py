@@ -41,25 +41,21 @@ wp.parse()
 
 print '\nCreating the posts…\n'
 
-indexPostListHTML = ''
+# Store the lines for the index in an array
+indexYears = []
 
-# post = wp.postsPublished[0]
+# Points to the current index year
+currentIndexYear = 0
 
-# counter = 0
+# Keep track of covered years
+coveredYears=[]
 
 # Load the post template
 postTemplateFile = open('post-template.html', 'r')
 postTemplate = unicode(postTemplateFile.read(), 'utf_8')
 postTemplateFile.close()
 
-years=[]
-
 for post in wp.postsPublished:
-
-    # Limit to three for initial testing.
-    # if counter == 3:
-    #     break
-    # counter += 1
 
     #
     # Write out comments for the post.
@@ -216,16 +212,20 @@ for post in wp.postsPublished:
     #
 
     # Check if we’ve reached a new year (and if so, create a heading for it)
-    indexListItem = ''
     year = post['date'].split(' ')[0].split('-')[0]
-    if year not in years:
+    if year not in coveredYears:
         # New year
-        years.append(year)
-        if not len(years) == 0:
-            indexListItem += '</ul>'
-        indexListItem += '<h3>%s</h3><ul></li>' % year
+        coveredYears.append(year)
 
-    indexListItem += u'\t\t\t\t<li><a href="/%s/">%s</a>' % (post['id'], postTitle)
+        currentIndexYear = len(indexYears)
+
+        currentYearDictionary = {}
+        currentYearDictionary['header'] = '<h3>%s</h3>' % year
+        currentYearDictionary['posts'] = []
+
+        indexYears.append(currentYearDictionary)
+
+    indexListItem = u'\t\t\t\t<li><a href="/%s/">%s</a>' % (post['id'], postTitle)
 
     # Post date may be None, check for this.
     if post['date'] != None:
@@ -235,13 +235,30 @@ for post in wp.postsPublished:
 
     indexListItem += u'</li>\n'
 
-    indexPostListHTML += indexListItem
+    indexYears[currentIndexYear]['posts'].append(indexListItem)
+
 
 #
 # Create and write out the index file
 #
 
 print '\nCreating the index…\n'
+
+# Reverse the years and the posts within the years
+# to create the index in reverse chronological order.
+
+indexPostListHTML = ''
+
+indexYears.reverse()
+for indexYear in indexYears:
+    print 'Creating index for year ' + indexYear['header']
+    indexPostListHTML += indexYear['header'] + '\n'
+    indexPostListHTML += '<ul>\n'
+    indexYear['posts'].reverse()
+    reversedPostsForYear = indexYear['posts']
+    for post in reversedPostsForYear:
+        indexPostListHTML += '\t' + post
+    indexPostListHTML += '</ul>\n'
 
 # Load the index template.
 indexTemplateFile = open('index-template.html', 'r')
