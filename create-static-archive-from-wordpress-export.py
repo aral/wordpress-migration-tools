@@ -52,6 +52,8 @@ postTemplateFile = open('post-template.html', 'r')
 postTemplate = unicode(postTemplateFile.read(), 'utf_8')
 postTemplateFile.close()
 
+years=[]
+
 for post in wp.postsPublished:
 
     # Limit to three for initial testing.
@@ -212,7 +214,18 @@ for post in wp.postsPublished:
     #
     # Add this post to the index post list for the archive’s index.
     #
-    indexListItem = u'\t\t\t\t<li><a href="/%s/">%s</a>' % (post['id'], postTitle)
+
+    # Check if we’ve reached a new year (and if so, create a heading for it)
+    indexListItem = ''
+    year = post['date'].split(' ')[0].split('-')[0]
+    if year not in years:
+        # New year
+        years.append(year)
+        if not len(years) == 0:
+            indexListItem += '</ul>'
+        indexListItem += '<h3>%s</h3><ul></li>' % year
+
+    indexListItem += u'\t\t\t\t<li><a href="/%s/">%s</a>' % (post['id'], postTitle)
 
     # Post date may be None, check for this.
     if post['date'] != None:
