@@ -2,6 +2,8 @@
 import argparse
 import os
 import parse_wordpress_export
+import StringIO
+from bs4 import BeautifulSoup
 
 # Shorthand reference to the namespace.
 wp = parse_wordpress_export
@@ -174,6 +176,47 @@ for post in wp.postsPublished:
             #     print 'Skipping unapproved comment.'
 
         commentsUL += '\n</ul>\n</section>\n'
+
+    #
+    # Massage the post contents. Apparently, at various times in my
+    # blogging career (yeah, right), WordPress alternated between using
+    # <br><br> (*shudder*) and nothing at all between paragraphs. Look at
+    # how I place the blame entirely with WordPress. I’m sure I had nothing
+    # to do with it whatsoever. :)
+    #
+
+    # 1. Remove any occurances of <br><br>. Seriously, there’s never a need for that.
+
+    # 2. Read through the content line by line and wrap <p> tags around
+    #    all the paragraphs. (Reading line by line makes it easier to avoid
+    #    adding <p> tags within <pre>formatted text, etc.)
+
+    massagedContent = '<p>'
+    lastLine = ''
+    inPreformattedText = False
+    buffer = StringIO.StringIO(post['content'])
+    line = buffer.readline()
+    while line:
+        if inPreformattedText:
+            # The crappy exported data doesn’t even escape angular brackets!
+            line = line.replace('<', '&lt;')
+            line = line.replace('>', '&gt;')
+        if '<pre' in line:
+            inPreformattedText = True
+        if '</pre' in line:
+            inPreformattedText = False
+
+        if not inPreformattedText:
+            if line == '\n':
+                if len(lastLine) > 0 and lastLine[-1] == '\n':
+                    lastLine += '</p><p>'
+        massagedContent += lastLine
+        lastLine = line
+        line = buffer.readline()
+
+    massagedContent += lastLine + '</p>'
+
+    post['content'] = massagedContent
 
     #
     # Write out the post.
