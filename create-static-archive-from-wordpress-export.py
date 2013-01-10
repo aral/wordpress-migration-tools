@@ -197,14 +197,18 @@ for post in wp.postsPublished:
     buffer = StringIO.StringIO(post['content'])
     line = buffer.readline()
     while line:
+        if '</pre' in line:
+            inPreformattedText = False
+            if post['id'] == '1269':
+                print 'Exiting preformatted text in line: ' + line
         if inPreformattedText:
             # The crappy exported data doesn’t even escape angular brackets!
             line = line.replace('<', '&lt;')
             line = line.replace('>', '&gt;')
         if '<pre' in line:
             inPreformattedText = True
-        if '</pre' in line:
-            inPreformattedText = False
+            if post['id'] == '1269':
+                print 'Entering preformatted text in line: ' + line
 
         if not inPreformattedText:
             if line == '\n':
@@ -248,7 +252,7 @@ for post in wp.postsPublished:
             </nav>
 
             <section id="archiveDisclaimer">
-                <p><strong>Historic content:</strong> This article was written on %s. You are viewing an archived post written from the old WordPress blog I had at this site. The archive has over 1,500 articles that I wrote over a ten year period. The formatting and contents of the posts may not display perfectly.</p>
+                <strong>Historic content:</strong> This article was written on %s. You are viewing an archived post written from the old WordPress blog I had at this site. The archive has over 1,500 articles that I wrote over a ten year period. The formatting and contents of the posts may not display perfectly.
             </section>
 
             <div role="content">
