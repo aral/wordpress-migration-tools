@@ -227,6 +227,10 @@ for post in wp.postsPublished:
             # The crappy exported data doesn’t even escape angular brackets!
             line = line.replace('<', '&lt;')
             line = line.replace('>', '&gt;')
+
+            # Replace tabs with two spaces to make code look neater
+            line = line.replace('\t', '  ')
+
         if '<pre' in line or '[as]' in line:
             inPreformattedText = True
 
