@@ -3,7 +3,8 @@ import argparse
 import os
 import parse_wordpress_export
 import StringIO
-from bs4 import BeautifulSoup
+from time_since import timesince
+from datetime import datetime
 
 # Shorthand reference to the namespace.
 wp = parse_wordpress_export
@@ -226,6 +227,10 @@ for post in wp.postsPublished:
     # Write out the post.
     #
 
+    # Time since the post was written
+    dateOfPost = datetime.strptime(post['date'], '%Y-%m-%d %H:%M:%S')
+    ageOfPost = timesince(dateOfPost)
+
     html = u"""
     <html>
         <head>
@@ -236,7 +241,7 @@ for post in wp.postsPublished:
             <link rel="stylesheet" href="/css/reset.css">
             <link rel="stylesheet" href="/css/stylus/styles.css">
             <link rel="stylesheet" href="/css/stylus/archive/styles.css">
-            <title>Aral Balkan: Historic Archive&#8202;—&#8202;%s</title>
+            <title>Aral Balkan: Historical Archive&#8202;—&#8202;%s</title>
         </head>
         <body>
             <header>
@@ -252,7 +257,7 @@ for post in wp.postsPublished:
             </nav>
 
             <section id="archiveDisclaimer">
-                <strong>Historic content:</strong> This article was written on %s. You are viewing an archived post written from the old WordPress blog I had at this site. The archive has over 1,500 articles that I wrote over a ten year period. The formatting and contents of the posts may not display perfectly.
+                <strong>Historical content: This article was written over %s</strong> on %s. You are viewing an archived post written from the old WordPress blog I had at this site. The archive has over 1,500 articles that I wrote over a ten year period. The formatting and contents of the posts may not display perfectly.
             </section>
 
             <div role="content">
@@ -324,7 +329,7 @@ for post in wp.postsPublished:
             </script>
         </body>
     </html>
-    """ % (post['title'], post['title'], post['date'], post['title'], post['content'], commentsUL, post['title'])
+    """ % (post['title'], post['title'], ageOfPost, post['date'], post['title'], post['content'], commentsUL, post['title'])
 
     # print html
 
