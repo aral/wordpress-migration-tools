@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
-
+import os
 import parse_wordpress_export
 
 # Shorthand reference to the namespace.
@@ -24,6 +24,11 @@ wp.parse()
 
 post = wp.postsPublished[0]
 
+
+#
+# Write out comments for the post.
+#
+
 commentsUL = u"""
     <!-- Comments -->
     <ul>
@@ -39,6 +44,10 @@ for comment in post['comments']:
         commentsUL += '\n\t\t' + li
     else:
         print 'Skipping unapproved comment.'
+
+#
+# Write out the post.
+#
 
 html = u"""
 <html>
@@ -59,3 +68,24 @@ html = u"""
 """ % (post['title'], post['title'], post['content'], commentsUL)
 
 print html
+
+#
+# Create a folder based on the ID and save the HTML in an index.html file.
+#
+postFolder = post['id']
+if not os.path.exists(postFolder):
+    os.makedirs(postFolder)
+
+postFilePath = postFolder + '/index.html'
+file = open(postFilePath, 'w')
+file.write(html)
+file.close()
+
+
+
+
+
+
+
+
+
