@@ -51,7 +51,7 @@ currentIndexYear = 0
 coveredYears=[]
 
 # Load the post template
-postTemplateFile = open('post-template.html', 'r')
+postTemplateFile = open('templates/post-template.html', 'r')
 postTemplate = unicode(postTemplateFile.read(), 'utf_8')
 postTemplateFile.close()
 
@@ -96,84 +96,91 @@ for post in wp.postsPublished:
 
         commentsUL += '\n</ul>\n</section>\n'
 
-    #
-    # Massage the post contents. Apparently, at various times in my
-    # blogging career (yeah, right), WordPress alternated between using
-    # <br><br> (*shudder*) and nothing at all between paragraphs. Look at
-    # how I place the blame entirely with WordPress. I’m sure I had nothing
-    # to do with it whatsoever. :)
-    #
+    # Check if the is static content to substitute for this post (if so, we will )
+    staticContentFilePath = 'static/%s.html' % post['id'];
+    if os.path.exists(staticContentFilePath):
+        staticContentFile = open(staticContentFilePath, 'r')
+        staticContent = unicode(staticContentFile.read(), 'utf_8')
+        post['content'] = staticContent
+    else:
+        #
+        # Massage the post contents. Apparently, at various times in my
+        # blogging career (yeah, right), WordPress alternated between using
+        # <br><br> (*shudder*) and nothing at all between paragraphs. Look at
+        # how I place the blame entirely with WordPress. I’m sure I had nothing
+        # to do with it whatsoever. :)
+        #
 
-    # * Remove any occurances of <br><br>. Seriously, there’s never a need for that.
+        # * Remove any occurances of <br><br>. Seriously, there’s never a need for that.
 
-    # * Read through the content line by line and wrap <p> tags around
-    #   all the paragraphs. (Reading line by line makes it easier to avoid
-    #   adding <p> tags within <pre>formatted text, etc.)
+        # * Read through the content line by line and wrap <p> tags around
+        #   all the paragraphs. (Reading line by line makes it easier to avoid
+        #   adding <p> tags within <pre>formatted text, etc.)
 
-    massagedContent = '<p>'
-    lastLine = ''
-    inPreformattedText = False
-    buffer = StringIO.StringIO(post['content'])
-    line = buffer.readline()
-    while line:
-        if '</pre' in line or '[/as]' in line:
-            inPreformattedText = False
-
-            if '[/as]' in line:
-                # Replace the [/as] shortcode with a </pre>
-                line = line.replace('[/as]', '</pre>')
-
-            # Debug: Using post 1269 to test the escaping of angular tags in
-            # ====== preformatted text.
-            # if post['id'] == '1269':
-            #     print 'Exiting preformatted text in line: ' + line
-        if inPreformattedText:
-            # The crappy exported data doesn’t even escape angular brackets!
-            line = line.replace('<', '&lt;')
-            line = line.replace('>', '&gt;')
-
-            # Replace tabs with two spaces to make code look neater
-            line = line.replace('\t', '  ')
-
-        if '<pre' in line or '[as]' in line:
-            inPreformattedText = True
-
-            if '[as]' in line:
-                # Replace the [as] shortcode with a <pre>
-                # Test with post 880.
-                line = line.replace('[as]', '<pre>')
-
-            # If the preformatted text starts with an empty line,
-            # remove it so that there isn’t too much whitespace at the top.
-            # Test with post 1269 (postsPublished[1000])
-            # and post 1030 (postsPublished[838])
-            if line[-2:] == '>\n':
-                line = line[:-1]
-
-            # Debug: Using post 1269 to test the escaping of angular tags in
-            # ====== preformatted text.
-            # if post['id'] == '1269':
-            #     print 'Entering preformatted text in line: ' + line
-
-        if not inPreformattedText:
-            if line == '<br />\n':
-                # Remove  <br> tag and wrap the last line in a paragraph
-                lastLine = '<p>' + lastLine.replace('<br />\n', '') + '</p>'
-                # And remove the current <br> tag too.
-                line = ''
-            if line == '\n':
-                if len(lastLine) > 0 and lastLine[-1] == '\n':
-                    lastLine += '</p><p>'
-        massagedContent += lastLine
-        lastLine = line
+        massagedContent = '<p>'
+        lastLine = ''
+        inPreformattedText = False
+        buffer = StringIO.StringIO(post['content'])
         line = buffer.readline()
+        while line:
+            if '</pre' in line or '[/as]' in line:
+                inPreformattedText = False
 
-    massagedContent += lastLine + '</p>'
+                if '[/as]' in line:
+                    # Replace the [/as] shortcode with a </pre>
+                    line = line.replace('[/as]', '</pre>')
 
-    # Remove any single <br> tags that we might have missed.
-    massagedContent = massagedContent.replace('<br />', '')
+                # Debug: Using post 1269 to test the escaping of angular tags in
+                # ====== preformatted text.
+                # if post['id'] == '1269':
+                #     print 'Exiting preformatted text in line: ' + line
+            if inPreformattedText:
+                # The crappy exported data doesn’t even escape angular brackets!
+                line = line.replace('<', '&lt;')
+                line = line.replace('>', '&gt;')
 
-    post['content'] = massagedContent
+                # Replace tabs with two spaces to make code look neater
+                line = line.replace('\t', '  ')
+
+            if '<pre' in line or '[as]' in line:
+                inPreformattedText = True
+
+                if '[as]' in line:
+                    # Replace the [as] shortcode with a <pre>
+                    # Test with post 880.
+                    line = line.replace('[as]', '<pre>')
+
+                # If the preformatted text starts with an empty line,
+                # remove it so that there isn’t too much whitespace at the top.
+                # Test with post 1269 (postsPublished[1000])
+                # and post 1030 (postsPublished[838])
+                if line[-2:] == '>\n':
+                    line = line[:-1]
+
+                # Debug: Using post 1269 to test the escaping of angular tags in
+                # ====== preformatted text.
+                # if post['id'] == '1269':
+                #     print 'Entering preformatted text in line: ' + line
+
+            if not inPreformattedText:
+                if line == '<br />\n':
+                    # Remove  <br> tag and wrap the last line in a paragraph
+                    lastLine = '<p>' + lastLine.replace('<br />\n', '') + '</p>'
+                    # And remove the current <br> tag too.
+                    line = ''
+                if line == '\n':
+                    if len(lastLine) > 0 and lastLine[-1] == '\n':
+                        lastLine += '</p><p>'
+            massagedContent += lastLine
+            lastLine = line
+            line = buffer.readline()
+
+        massagedContent += lastLine + '</p>'
+
+        # Remove any single <br> tags that we might have missed.
+        massagedContent = massagedContent.replace('<br />', '')
+
+        post['content'] = massagedContent
 
     # Time since the post was written
     dateOfPost = datetime.strptime(post['date'], '%Y-%m-%d %H:%M:%S')
@@ -268,7 +275,7 @@ for indexYear in indexYears:
     indexPostListHTML += '</ul>\n'
 
 # Load the index template.
-indexTemplateFile = open('index-template.html', 'r')
+indexTemplateFile = open('templates/index-template.html', 'r')
 indexTemplate = unicode(indexTemplateFile.read(), 'utf_8')
 indexTemplateFile.close()
 

@@ -227,6 +227,3 @@ def parse():
 
     # Info: number of posts in each status type
     print 'There are %d published, %d draft, and %d private posts.' % (len(postsPublished), len(postsDraft), len(postsPrivate))
-
-
-    print pages
