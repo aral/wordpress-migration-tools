@@ -12,6 +12,10 @@
 #   880                             [as]…[/as] short‐codes to <pre>
 #   1030    publishedPosts[838]     <pre> with multiple \n’s that can get erroneously
 #                                   stripped out by code to strip out first \n <pre>s
+#
+#   26      publishedPosts[23]      Paragraphs not being created properly.
+#
+#   23                              Comments showing although there are no comments.
 
 import argparse
 import os
@@ -163,6 +167,8 @@ for post in wp.postsPublished:
                 #     print 'Entering preformatted text in line: ' + line
 
             if not inPreformattedText:
+                if line[:12] == '<br /><br />':
+                    lastLine = '<p>' + lastLine + '</p>'
                 if line == '<br />\n':
                     # Remove  <br> tag and wrap the last line in a paragraph
                     lastLine = '<p>' + lastLine.replace('<br />\n', '') + '</p>'

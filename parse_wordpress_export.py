@@ -62,8 +62,12 @@
 
 import xml.etree.ElementTree as ET
 
+#
 # Options
+# TODO: Make these into parameters.
+#
 verbose = False
+
 
 channel = None
 items = None
@@ -93,6 +97,15 @@ unknown = []
 postsPublished = []
 postsDraft = []
 postsPrivate = []
+
+#
+# Links in content
+#
+links = []
+linksToImages = []
+linksToDownloads = []
+linksToUploadedMedia = []
+
 
 #
 # Tag shortcuts for easy use when searching
