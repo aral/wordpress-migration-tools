@@ -6,29 +6,29 @@
 #
 # Content tests:
 #
-#   Post ID Published Post ID   Notes
-#   ======= =================   =========================================================
-#   1269                        <pre> tags, <p> wrapping
+#   Post ID Published Post Index    Notes
+#   ======= ====================    =========================================================
+#   1269        1000                <pre> tags, <p> wrapping
 #
-#   2                           <br><br> tag stripping
+#   2                               <br><br> tag stripping
 #
-#   1951        1000            Extra space at the top of <pre>, lack of <p> after pre
+#   1951        1279                Extra space at the top of <pre>, lack of <p> after pre
 #
-#   880                         [as]…[/as] short‐codes to <pre>
+#   880         693                 [as]…[/as] short‐codes to <pre>
 #
-#   1030        838             <pre> with multiple \n’s that can get erroneously
-#                               stripped out by code to strip out first \n <pre>s
+#   1030        838                 <pre> with multiple \n’s that can get erroneously
+#                                   stripped out by code to strip out first \n <pre>s
 #
-#   26          23              Paragraphs not being created properly.
+#   26          23                  Paragraphs not being created properly.
 #
-#   23          20              Comments showing although there are no comments.
+#   23          20                  Comments showing although there are no comments.
 #
-#   2760        1410            HTML/pre parsing not correct
-#                               (due to single line <pre>s) - Fixed.
+#   2760        1410                HTML/pre parsing not correct
+#                                   (due to single line <pre>s) - Fixed.
 #
-#   3133        1447            HTML/pre parsing not correct (due to single line <pre that
-#                               has an attribute that was not caught by implementation
-#                               for post 2760, above.) - Fixed.
+#   3133        1447                HTML/pre parsing not correct (due to single line <pre that
+#                                   has an attribute that was not caught by implementation
+#                                   for post 2760, above.) - Fixed.
 
 import argparse
 import os
@@ -77,7 +77,7 @@ indexYears = []
 currentIndexYear = 0
 
 # Keep track of covered years
-coveredYears=[]
+coveredYears = []
 
 # Load the post template
 postTemplateFile = open('templates/post-template.html', 'r')
