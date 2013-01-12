@@ -13,24 +13,20 @@ from bs4 import BeautifulSoup
 import re
 
 domain = 'aralbalkan.com'
-imagesFolder = 'images'
-downloadsFolder = 'downloads'
-uploadedMediaFolder = 'wp-content/uploads'
 
-linksToImages = set()
-linksToDownloads = set()
-linksToUploadedMedia = set()
+validDownloadFolders = set(['images', 'downloads', 'wp-content/uploads', 'presentations', 'swfs', 'code', 'demos', 'flas'])
 
-imagesInImages = set()
-imagesInDownloads = set()
-imagesInUploadedMedia = set()
+links = set()
+images = set()
+
+allLinks = set()
 
 # Shorthand reference to the namespace.
 wp = parse_wordpress_export
 
 wp.parse()
 
-linksLocal = []
+print '\nExamining local images and links in posts…\n'
 
 regularPostLinkPattern = u'http://' + domain.replace('.', '\\.') + '/\d{1,4}'
 
@@ -43,81 +39,57 @@ for post in wp.postsPublished:
 
     linksInPost = soup.findAll('a')
     for linkSoup in linksInPost:
+
         try:
             link = unicode(linkSoup['href']).lower()
         except Exception:
-            print u'Error with link in post ID ' + post['id'] + ': ' + unicode(linkSoup)
+            print u'\tError with link in post with id ' + post['id'] + ': ' + unicode(linkSoup)
+
         if link.startswith(u'http://' + domain) or link.startswith(u'http://www.' + domain) or (not link.startswith(u'http')):
 
             if not regularPostLinkRegex.match(link):
 
-                if link.startswith(imagesFolder) or link.startswith('/' + imagesFolder) or link.startswith(u'http://' + domain + '/' + imagesFolder):
-                    # image
-                    linksToImages.add(link)
+                for validDownloadFolder in validDownloadFolders:
+                    if link.startswith(validDownloadFolder) or link.startswith('/' + validDownloadFolder) or link.startswith(u'http://' + domain + '/' + validDownloadFolder):
+                        links.add(link)
 
-                if link.startswith(downloadsFolder) or link.startswith('/' + downloadsFolder) or link.startswith(u'http://' + domain + '/' + downloadsFolder):
-                    # download
-                    linksToDownloads.add(link)
-
-                if link.startswith(uploadedMediaFolder) or link.startswith('/' + uploadedMediaFolder) or link.startswith(u'http://' + domain + '/' + uploadedMediaFolder):
-                    # uploaded media
-                    linksToUploadedMedia.add(link)
-
-                linksLocal.append(link)
+                # Catch‐all
+                allLinks.add(link)
 
     imagesInPost = soup.findAll('img')
     for linkSoup in imagesInPost:
         try:
             link = unicode(linkSoup['src']).lower()
         except Exception:
-            print u'Error with image source in post with id ' + post['id'] + ': ' + unicode(linkSoup)
-        if link.startswith(imagesFolder) or link.startswith('/' + imagesFolder) or link.startswith(u'http://' + domain + '/' + imagesFolder):
-            # image
-            imagesInImages.add(link)
+            print u'\tError with image source in post with id ' + post['id'] + ': ' + unicode(linkSoup)
+        if link.startswith(u'http://' + domain) or link.startswith(u'http://www.' + domain) or (not link.startswith(u'http')):
 
-        if link.startswith(downloadsFolder) or link.startswith('/' + downloadsFolder) or link.startswith(u'http://' + domain + '/' + downloadsFolder):
-            # download
-            imagesInDownloads.add(link)
+                images.add(link)
 
-        if link.startswith(uploadedMediaFolder) or link.startswith('/' + uploadedMediaFolder) or link.startswith(u'http://' + domain + '/' + uploadedMediaFolder):
-            # uploaded media
-            imagesInUploadedMedia.add(link)
+numImages = len(images)
+numLinks = len(links)
+
+print '\nFound %d local images and %d links to local assets.\n' % (numImages, numLinks)
 
 # Get links from any static content files
 # TODO
 
-print u"Images (<img src='…'>)"
-print u"====================\n"
+# print u"Images (<img src='…'>)"
+# print u"====================\n"
 
-print imagesFolder + "\n"
-print imagesInImages
-print "\n===\n"
+# print images
 
-print downloadsFolder + "\n"
-print imagesInDownloads
-print "\n===\n"
-
-print uploadedMediaFolder + "\n"
-print imagesInUploadedMedia
-print "\n===\n"
+# print "\n===\n"
 
 
-print u"Links (<a href='…'>)"
-print u"====================\n"
+# print u"Links (<a href='…'>)"
+# print u"====================\n"
 
-print imagesFolder + "\n"
-print linksToImages
-print "\n===\n"
+# print links
 
-print downloadsFolder + "\n"
-print linksToDownloads
-print "\n===\n"
-
-print uploadedMediaFolder + "\n"
-print linksToUploadedMedia
-print "\n===\n"
+# print "\n===\n"
 
 # print "\n============\n"
 
-# for link in linksLocal:
+# for link in allLinks:
 #     print link

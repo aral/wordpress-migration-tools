@@ -139,15 +139,15 @@ for post in wp.postsPublished:
         print '\tInfo: applying manual fixes for post with id %s.' % post['id']
         fixesFile = open(fixesFilePath, 'r')
         textToFind = unicode(fixesFile.readline(), 'utf_8')
-        textToFind = textToFind.strip('\n')
         while textToFind:
+            textToFind = textToFind.strip()
             textToReplace = unicode(fixesFile.readline(), 'utf_8')
-            textToReplace = textToReplace.strip('\n')
+            textToReplace = textToReplace.strip()
             if not textToReplace:
                 print "Error: invalid syntax in fixes file for post %s." % post['id']
                 break
             post['content'] = post['content'].replace(textToFind, textToReplace)
-            textToFind = fixesFile.readline()
+            textToFind = unicode(fixesFile.readline(), 'utf_8')
 
     # Check if the is static content to substitute for this post (if so, we will )
     staticContentFilePath = 'static/%s.html' % post['id']
