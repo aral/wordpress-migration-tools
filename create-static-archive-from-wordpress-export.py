@@ -125,8 +125,32 @@ for post in wp.postsPublished:
 
         commentsUL += '\n</ul>\n</section>\n'
 
+    #
+    # Check if there are fixes for this particular post
+    #
+    # A fix file has simple content substitutions in the following format:
+    #
+    # line to match
+    # line to substitute
+    # ...
+    #
+    fixesFilePath = 'fixes/%s.html' % post['id']
+    if os.path.exists(fixesFilePath):
+        print '\tInfo: applying manual fixes for post with id %s.' % post['id']
+        fixesFile = open(fixesFilePath, 'r')
+        textToFind = unicode(fixesFile.readline(), 'utf_8')
+        textToFind = textToFind.strip('\n')
+        while textToFind:
+            textToReplace = unicode(fixesFile.readline(), 'utf_8')
+            textToReplace = textToReplace.strip('\n')
+            if not textToReplace:
+                print "Error: invalid syntax in fixes file for post %s." % post['id']
+                break
+            post['content'] = post['content'].replace(textToFind, textToReplace)
+            textToFind = fixesFile.readline()
+
     # Check if the is static content to substitute for this post (if so, we will )
-    staticContentFilePath = 'static/%s.html' % post['id'];
+    staticContentFilePath = 'static/%s.html' % post['id']
     if os.path.exists(staticContentFilePath):
         staticContentFile = open(staticContentFilePath, 'r')
         staticContent = unicode(staticContentFile.read(), 'utf_8')
