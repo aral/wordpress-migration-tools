@@ -6,17 +6,29 @@
 #
 # Content tests:
 #
-#   1269                            <pre> tags, <p> wrapping
-#   2                               <br><br> tag stripping
-#   1951    publishedPosts[1000]    Extra space at the top of <pre>, lack of <p> after pre
-#   880                             [as]…[/as] short‐codes to <pre>
-#   1030    publishedPosts[838]     <pre> with multiple \n’s that can get erroneously
-#                                   stripped out by code to strip out first \n <pre>s
+#   Post ID Published Post ID   Notes
+#   ======= =================   =========================================================
+#   1269                        <pre> tags, <p> wrapping
 #
-#   26      publishedPosts[23]      Paragraphs not being created properly.
+#   2                           <br><br> tag stripping
 #
-#   23                              Comments showing although there are no comments.
-#   2760    publishedPosts[1410]    HTML/pre parsing not correct.
+#   1951        1000            Extra space at the top of <pre>, lack of <p> after pre
+#
+#   880                         [as]…[/as] short‐codes to <pre>
+#
+#   1030        838             <pre> with multiple \n’s that can get erroneously
+#                               stripped out by code to strip out first \n <pre>s
+#
+#   26          23              Paragraphs not being created properly.
+#
+#   23          20              Comments showing although there are no comments.
+#
+#   2760        1410            HTML/pre parsing not correct
+#                               (due to single line <pre>s) - Fixed.
+#
+#   3133        1447            HTML/pre parsing not correct (due to single line <pre that
+#                               has an attribute that was not caught by implementation
+#                               for post 2760, above.) - Fixed.
 
 import argparse
 import os
@@ -149,7 +161,7 @@ for post in wp.postsPublished:
                     gistID = match.groups()[0]
                     scriptEmdedCode = '<script src="https://gist.github.com/%s.js"></script>' % gistID
                     line = line.replace(match.string[match.start():match.end()], scriptEmdedCode)
-            if '<pre>' in line and '</pre>' in line:
+            if re.search(r'<pre.*?>', line) and '</pre>' in line:
                 # Pre tag is on a single line
                 # Test with post id = 2760 (postsPublished[1410])
                 singleLinePre = True
