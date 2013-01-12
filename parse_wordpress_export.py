@@ -80,6 +80,8 @@ itemElements = None
 #
 items = []
 
+itemTypes = []
+
 #
 # Item namespaces (with alias names as set by ElementTree)
 #
@@ -158,12 +160,15 @@ def parse():
     # Separate the posts by type for further processing
 
     for itemElement in itemElements:
-        postType = itemElement.find(ns3PostType)
-        if postType.text == 'post':
+        itemType = itemElement.find(ns3PostType)
+
+
+
+        if itemType.text == 'post':
             posts.append(itemElement)
-        elif postType.text == 'page':
+        elif itemType.text == 'page':
             pages.append(itemElement)
-        elif postType.text == 'attachment':
+        elif itemType.text == 'attachment':
             attachments.append(itemElement)
         else:
             unknown.append(itemElement)

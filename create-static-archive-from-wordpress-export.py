@@ -16,13 +16,26 @@
 #   26      publishedPosts[23]      Paragraphs not being created properly.
 #
 #   23                              Comments showing although there are no comments.
+#   2760    publishedPosts[1410]    HTML/pre parsing not correct.
 
 import argparse
 import os
 import parse_wordpress_export
 import StringIO
+import re
 from time_since import timesince
 from datetime import datetime
+
+def massagePreformattedText(line):
+    # The crappy exported data doesn’t even escape angular brackets!
+    line = line.replace('<', '&lt;')
+    line = line.replace('>', '&gt;')
+
+    # Replace tabs with two spaces to make code look neater
+    line = line.replace('\t', '  ')
+
+    return line
+
 
 # Shorthand reference to the namespace.
 wp = parse_wordpress_export
@@ -127,7 +140,19 @@ for post in wp.postsPublished:
         buffer = StringIO.StringIO(post['content'])
         line = buffer.readline()
         while line:
-            if '</pre' in line or '[/as]' in line:
+            singleLinePre = False
+            if '<pre>' in line and '</pre>' in line:
+                # Pre tag is on a single line
+                # Test with post id = 2760 (postsPublished[1410])
+                singleLinePre = True
+                match = re.match(r'<pre>(.*?)</pre>', line)
+                if match:
+                    matchedGroups = match.groups()
+                    preformattedText = matchedGroups[0]
+                    massagedPreformattedText = massagePreformattedText(preformattedText)
+                    line.replace(preformattedText, massagedPreformattedText)
+
+            if ('</pre' in line or '[/as]' in line) and not singleLinePre:
                 inPreformattedText = False
 
                 if '[/as]' in line:
@@ -146,7 +171,7 @@ for post in wp.postsPublished:
                 # Replace tabs with two spaces to make code look neater
                 line = line.replace('\t', '  ')
 
-            if '<pre' in line or '[as]' in line:
+            if ('<pre' in line or '[as]' in line) and not singleLinePre:
                 inPreformattedText = True
 
                 if '[as]' in line:
