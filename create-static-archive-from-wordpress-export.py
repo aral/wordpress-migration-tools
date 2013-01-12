@@ -210,6 +210,7 @@ for post in wp.postsPublished:
         buffer = StringIO.StringIO(post['content'])
         line = buffer.readline()
         while line:
+
             singleLinePre = False
             if '[gist' in line:
                 # Gist embed shorttag support
@@ -219,6 +220,7 @@ for post in wp.postsPublished:
                     gistID = match.groups()[0]
                     scriptEmdedCode = '<script src="https://gist.github.com/%s.js"></script>' % gistID
                     line = line.replace(match.string[match.start():match.end()], scriptEmdedCode)
+
             if re.search(r'<pre.*?>', line) and '</pre>' in line:
                 # Pre tag is on a single line
                 # Test with post id = 2760 (postsPublished[1410])
@@ -241,6 +243,7 @@ for post in wp.postsPublished:
                 # ====== preformatted text.
                 # if post['id'] == '1269':
                 #     print 'Exiting preformatted text in line: ' + line
+
             if inPreformattedText:
                 # The crappy exported data doesn’t even escape angular brackets!
                 line = line.replace('<', '&lt;')

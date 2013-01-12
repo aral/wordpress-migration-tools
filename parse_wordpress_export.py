@@ -153,6 +153,11 @@ def publishedPostIndexForPostID(postID):
     return None
 
 
+def publishedPostWithID(postID):
+    publishedPostIndex = publishedPostIndexForPostID(postID)
+    return postsPublished[publishedPostIndex]
+
+
 def parse():
 
     print 'Parsing the Wordpress export…'
