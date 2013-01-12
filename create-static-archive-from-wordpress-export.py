@@ -103,6 +103,9 @@ for post in wp.postsPublished:
     # The script expects one ID per line and doesn’t do much error checking
     # so play nice. :)
     #
+    # You can also use 'all' (without quotes) to remove all comments from
+    # a given post.
+    #
     # You can test this with post
 
     spamCommentIDs = set()
@@ -113,44 +116,48 @@ for post in wp.postsPublished:
         spamFileContents = unicode(spamFile.read(), 'utf_8')
         spamCommentIDs = set(spamFileContents.split('\n'))
 
+
     # To hold the unordered list of comments.
     commentsUL = u''
 
-    # Only create comments section if there are comments.
-    if len(post['comments']) > 0:
-        commentsUL = u"""
-            <section id="comments">
-            <h3>Comments</h3>
-            <ul>
-        """
+    # Don’t write out comments if 'all' was in the spam file for this post.
+    if 'all' not in spamCommentIDs:
 
-        for comment in post['comments']:
+        # Only create comments section if there are comments.
+        if len(post['comments']) > 0:
+            commentsUL = u"""
+                <section id="comments">
+                <h3>Comments</h3>
+                <ul>
+            """
 
-            # Only include approved comments that are not marked as spam.
-            if (comment['approved'] == '1') and (comment['id'] not in spamCommentIDs):
+            for comment in post['comments']:
 
-                li = u'<li id="%s">' % comment['id']
-                li += comment['content']
+                # Only include approved comments that are not marked as spam.
+                if (comment['approved'] == '1') and (comment['id'] not in spamCommentIDs):
 
-                commentAuthor = 'Anonymous'
-                if comment['author'] != None:
-                    commentAuthor = comment['author']
-                else:
-                    print '\tInfo: Unknown author in comment on post with id: %s.' % post['id']
+                    li = u'<li id="%s">' % comment['id']
+                    li += comment['content']
 
-                # commentDate = 'an unknown date'
-                # if comment['date'] != None:
-                #     commentDate = comment['date']
+                    commentAuthor = 'Anonymous'
+                    if comment['author'] != None:
+                        commentAuthor = comment['author']
+                    else:
+                        print '\tInfo: Unknown author in comment on post with id: %s.' % post['id']
+
+                    # commentDate = 'an unknown date'
+                    # if comment['date'] != None:
+                    #     commentDate = comment['date']
+                    # else:
+                    #     print 'Unknown date in comment on post with id: ' + post['id']
+
+                    li += u'\n<p class="byline">by ' + commentAuthor + u' on ' + comment['date'] + u'</p>'
+                    li += u'</li>'
+                    commentsUL += '\n\t\t' + li
                 # else:
-                #     print 'Unknown date in comment on post with id: ' + post['id']
+                #     print 'Skipping unapproved comment.'
 
-                li += u'\n<p class="byline">by ' + commentAuthor + u' on ' + comment['date'] + u'</p>'
-                li += u'</li>'
-                commentsUL += '\n\t\t' + li
-            # else:
-            #     print 'Skipping unapproved comment.'
-
-        commentsUL += '\n</ul>\n</section>\n'
+            commentsUL += '\n</ul>\n</section>\n'
 
     #
     # Check if there are fixes for this particular post
