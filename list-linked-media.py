@@ -17,9 +17,13 @@ imagesFolder = 'images'
 downloadsFolder = 'downloads'
 uploadedMediaFolder = 'wp-content/uploads'
 
-images = set()
-downloads = set()
-uploadedMedia = set()
+linksToImages = set()
+linksToDownloads = set()
+linksToUploadedMedia = set()
+
+imagesInImages = set()
+imagesInDownloads = set()
+imagesInUploadedMedia = set()
 
 # Shorthand reference to the namespace.
 wp = parse_wordpress_export
@@ -36,6 +40,7 @@ regularPostLinkRegex = re.compile(regularPostLinkPattern)
 for post in wp.postsPublished:
     content = post['content']
     soup = BeautifulSoup(content, 'html5lib')
+
     linksInPost = soup.findAll('a')
     for linkSoup in linksInPost:
         try:
@@ -48,32 +53,68 @@ for post in wp.postsPublished:
 
                 if link.startswith(imagesFolder) or link.startswith('/' + imagesFolder) or link.startswith(u'http://' + domain + '/' + imagesFolder):
                     # image
-                    images.add(link)
+                    linksToImages.add(link)
 
                 if link.startswith(downloadsFolder) or link.startswith('/' + downloadsFolder) or link.startswith(u'http://' + domain + '/' + downloadsFolder):
                     # download
-                    downloads.add(link)
+                    linksToDownloads.add(link)
 
                 if link.startswith(uploadedMediaFolder) or link.startswith('/' + uploadedMediaFolder) or link.startswith(u'http://' + domain + '/' + uploadedMediaFolder):
                     # uploaded media
-                    uploadedMedia.add(link)
+                    linksToUploadedMedia.add(link)
 
                 linksLocal.append(link)
+
+    imagesInPost = soup.findAll('img')
+    for linkSoup in imagesInPost:
+        try:
+            link = unicode(linkSoup['src']).lower()
+        except Exception:
+            print u'Error with image source in post with id ' + post['id'] + ': ' + unicode(linkSoup)
+        if link.startswith(imagesFolder) or link.startswith('/' + imagesFolder) or link.startswith(u'http://' + domain + '/' + imagesFolder):
+            # image
+            imagesInImages.add(link)
+
+        if link.startswith(downloadsFolder) or link.startswith('/' + downloadsFolder) or link.startswith(u'http://' + domain + '/' + downloadsFolder):
+            # download
+            imagesInDownloads.add(link)
+
+        if link.startswith(uploadedMediaFolder) or link.startswith('/' + uploadedMediaFolder) or link.startswith(u'http://' + domain + '/' + uploadedMediaFolder):
+            # uploaded media
+            imagesInUploadedMedia.add(link)
 
 # Get links from any static content files
 # TODO
 
+print u"Images (<img src='…'>)"
+print u"====================\n"
 
-print "Images:\n"
-print images
+print imagesFolder + "\n"
+print imagesInImages
 print "\n===\n"
 
-print "Downloads:\n"
-print downloads
+print downloadsFolder + "\n"
+print imagesInDownloads
 print "\n===\n"
 
-print "Uploaded media:\n"
-print uploadedMedia
+print uploadedMediaFolder + "\n"
+print imagesInUploadedMedia
+print "\n===\n"
+
+
+print u"Links (<a href='…'>)"
+print u"====================\n"
+
+print imagesFolder + "\n"
+print linksToImages
+print "\n===\n"
+
+print downloadsFolder + "\n"
+print linksToDownloads
+print "\n===\n"
+
+print uploadedMediaFolder + "\n"
+print linksToUploadedMedia
 print "\n===\n"
 
 # print "\n============\n"
