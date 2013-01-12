@@ -145,6 +145,14 @@ postStatusTypes = {}
 postCounts = {'draft': 0, 'published': 0}
 
 
+def publishedPostIndexForPostID(postID):
+    for post in postsPublished:
+        if post['id'] == postID:
+            publishedPostIndex = postsPublished.index(post)
+            return publishedPostIndex
+    return None
+
+
 def parse():
 
     print 'Parsing the Wordpress export…'
@@ -161,8 +169,6 @@ def parse():
 
     for itemElement in itemElements:
         itemType = itemElement.find(ns3PostType)
-
-
 
         if itemType.text == 'post':
             posts.append(itemElement)

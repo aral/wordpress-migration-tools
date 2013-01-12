@@ -141,6 +141,14 @@ for post in wp.postsPublished:
         line = buffer.readline()
         while line:
             singleLinePre = False
+            if '[gist' in line:
+                # Gist embed shorttag support
+                # Test with post id 3950 (publishedPosts[1550])
+                match = re.search('\[gist id=(\d{1,20}).*?\]', line)
+                if match:
+                    gistID = match.groups()[0]
+                    scriptEmdedCode = '<script src="https://gist.github.com/%s.js"></script>' % gistID
+                    line = line.replace(match.string[match.start():match.end()], scriptEmdedCode)
             if '<pre>' in line and '</pre>' in line:
                 # Pre tag is on a single line
                 # Test with post id = 2760 (postsPublished[1410])
