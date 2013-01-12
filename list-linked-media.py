@@ -9,6 +9,7 @@
 
 import parse_wordpress_export
 from StringIO import StringIO
+from bs4 import BeautifulSoup
 
 domain = 'aralbalkan.com'
 imagesFolder = '/images'
@@ -20,10 +21,23 @@ wp = parse_wordpress_export
 
 wp.parse()
 
-# Get links from the WordPress export files
-for post in wp.posts:
-	content = post['content']
+linksLocal = []
 
+# Get links from the WordPress export files
+for post in wp.postsPublished:
+	content = post['content']
+	soup = BeautifulSoup(content, 'html5lib')
+	linksInPost = soup.findAll('a')
+	for linkSoup in linksInPost:
+		try:
+			link = unicode(linkSoup['href']).lower()
+		except Exception:
+			print u'Error with link in post ID ' + post['id'] + ': ' + unicode(linkSoup)
+		if link.startswith('http://' + domain) or (not link.startswith('http')):
+			linksLocal.append(link)
 
 # Get links from any static content files
 # TODO
+
+for link in linksLocal:
+	print link

@@ -70,7 +70,15 @@ verbose = False
 
 
 channel = None
-items = None
+itemElements = None
+
+#
+# The global list of parsed items, organised by post type and status.
+#
+# e.g., items['post']['publish'] = All published posts
+#       items['page']['draft'] = All draft pages
+#
+items = []
 
 #
 # Item namespaces (with alias names as set by ElementTree)
@@ -79,9 +87,6 @@ dc = "http://purl.org/dc/elements/1.1/"
 ns1 = "http://purl.org/rss/1.0/modules/content/"
 ns2 = "http://wordpress.org/export/1.2/excerpt/"
 ns3 = "http://wordpress.org/export/1.2/"
-
-# Hold an index of posts
-index = []
 
 #
 # Item collections by type
@@ -148,20 +153,20 @@ def parse():
     print 'Done.\n'
 
     channel = root.find('channel')
-    items = channel.findall('item')
+    itemElements = channel.findall('item')
 
     # Separate the posts by type for further processing
 
-    for item in items:
-        postType = item.find(ns3PostType)
+    for itemElement in itemElements:
+        postType = itemElement.find(ns3PostType)
         if postType.text == 'post':
-            posts.append(item)
+            posts.append(itemElement)
         elif postType.text == 'page':
-            pages.append(item)
+            pages.append(itemElement)
         elif postType.text == 'attachment':
-            attachments.append(item)
+            attachments.append(itemElement)
         else:
-            unknown.append(item)
+            unknown.append(itemElement)
 
     print 'There are %d posts, %d pages, and %d attachments.' % (len(posts), len(pages), len(attachments))
 
