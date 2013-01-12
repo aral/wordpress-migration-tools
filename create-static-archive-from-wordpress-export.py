@@ -89,6 +89,31 @@ for post in wp.postsPublished:
     #
     # Write out comments for the post.
     #
+
+    #
+    # Check to see if comment spam info is available for this post.
+    #
+    # To flag a comment as spam, create a file with the ID of the post
+    # that the comment is in as its name in the /spam folder
+    #
+    # e.g., /spam/3803.html
+    #
+    # Then enter the IDs of the comments that you want to mark as spam.
+    # These will not be included in the final page.
+    # The script expects one ID per line and doesn’t do much error checking
+    # so play nice. :)
+    #
+    # You can test this with post
+
+    spamCommentIDs = set()
+    spamFilePath = 'spam/%s.html' % post['id']
+    if os.path.exists(spamFilePath):
+        print '\tInfo: Applying comment spam filter for post with id %s.' % post['id']
+        spamFile = open(spamFilePath, 'r')
+        spamFileContents = unicode(spamFile.read(), 'utf_8')
+        spamCommentIDs = set(spamFileContents.split('\n'))
+
+    # To hold the unordered list of comments.
     commentsUL = u''
 
     # Only create comments section if there are comments.
@@ -100,9 +125,11 @@ for post in wp.postsPublished:
         """
 
         for comment in post['comments']:
-            # Only include approved comments.
-            if comment['approved'] == '1':
-                li = u'<li>'
+
+            # Only include approved comments that are not marked as spam.
+            if (comment['approved'] == '1') and (comment['id'] not in spamCommentIDs):
+
+                li = u'<li id="%s">' % comment['id']
                 li += comment['content']
 
                 commentAuthor = 'Anonymous'
