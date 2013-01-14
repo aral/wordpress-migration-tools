@@ -21,16 +21,16 @@ create-static-archive-from-wordpress-export.py takes the name of your WordPress 
 
 If you want to use this script, you can configure its behaviour by using the following folders:
 
-* /templates - index-template.html is used for the archive index and post-template.html is used for each of the posts
+* **/templates** - index-template.html is used for the archive index and post-template.html is used for each of the posts
 
-* /static - any files you put in here will be used to replace the post content in the export file. Name the files with the ID of the post you want to replace and give it a .html extension. e.g., the contents of a file called 4901.html will be used instead of the contents of post with ID 4901 when generating the static page for that post.
+* **/static** - any files you put in here will be used to replace the post content in the export file. Name the files with the ID of the post you want to replace and give it a .html extension. e.g., the contents of a file called 4901.html will be used instead of the contents of post with ID 4901 when generating the static page for that post.
 
-* /fixes - any files you put in here will be used to substitute content within posts as they are being generated. Put the content to search for on one line and the content to replace it with on the next line (rinse, repeat). So, for example, to replace the typo <a hrf in post with ID 2340, create a file called 2340.html in the fixes folder, put ```<a hrf``` on the first line, by itself, and ```<a href``` on the second line and the substitution will be made as your content is being generated:
+* **/fixes** - any files you put in here will be used to substitute content within posts as they are being generated. Put the content to search for on one line and the content to replace it with on the next line (rinse, repeat). So, for example, to replace the typo <a hrf in post with ID 2340, create a file called 2340.html in the fixes folder, put ```<a hrf``` on the first line, by itself, and ```<a href``` on the second line and the substitution will be made as your content is being generated:
 
         <a hrf
         <a href
 
-* /spam - You can have certain comments (or all comments) for a post removed as the static site is being generated. Just create a file named with the ID of the post you want to affect (e.g., 601.html) and put the comment IDs that you want to remove in the file, each on its own line. Or, alternatively, put 'all' (without quotes) in the file to remove all comments (including the Comments section and its header).
+* **/spam** - You can have certain comments (or all comments) for a post removed as the static site is being generated. Just create a file named with the ID of the post you want to affect (e.g., 601.html) and put the comment IDs that you want to remove in the file, each on its own line. Or, alternatively, put 'all' (without quotes) in the file to remove all comments (including the Comments section and its header).
 
 You can see the files I used for my migration in the /templates, /static, and /fixes folders in the repository.
 
