@@ -8,18 +8,107 @@
 #
 
 import parse_wordpress_export
-from StringIO import StringIO
 from bs4 import BeautifulSoup
 import re
+import os
+import urllib2
+
+#
+# Options
+#
+# TODO: Make into a command‐line arguments.
+dryRun = False
 
 domain = 'aralbalkan.com'
 
 validDownloadFolders = set(['images', 'downloads', 'wp-content/uploads', 'presentations', 'swfs', 'code', 'demos', 'flas'])
 
+
+#
+# Containers
+#
 links = set()
 images = set()
+attachments = set()
 
 allLinks = set()
+
+
+#
+# Helpers
+#
+
+def makeRelativeLink(link):
+    #
+    # Massage the link to remove possible domain
+    #
+    link = link.replace('http://' + domain + '/', '')
+    if link[0] == '/':
+        # Also replace trailing slashes, if any
+        link = link[1:]
+    return link
+
+
+def download(relativePath):
+    pathComponents = relativePath.split('/')
+    path = '/'.join(pathComponents[:-1])
+    path = 'build/' + path
+    fileName = pathComponents[-1]
+
+    if fileName == '':
+        print 'Info: %s is a folder not a file. Skipping.' % relativePath
+        return
+
+    outputFilePath = path + '/' + fileName
+
+    url = 'http://%s/%s' % (domain, relativePath)
+
+    if dryRun:
+        print '%s => %s (%s)' % (path, fileName, url)
+    else:
+        #
+        # Not a dry run, actually download the files.
+        #
+
+        # Create the local folder to hold the file
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        #
+        # Courtesy http://stackoverflow.com/questions/22676/how-do-i-download-a-file-over-http-using-python
+        #
+
+        try:
+            u = urllib2.urlopen(url)
+        except urllib2.HTTPError, e:
+            print 'Error downloading %s: %s' % (relativePath, e.code)
+        except urllib2.URLError, e:
+            print 'Error reaching %s: %s' % (relativePath, e.reason)
+        else:
+            f = open(outputFilePath, 'wb')
+            meta = u.info()
+            fileSize = int(meta.getheaders("Content-Length")[0])
+            print "\t%s (%s bytes)" % (relativePath, fileSize)
+
+            fileSizeDownloaded = 0
+            blockSize = 8192
+            while True:
+                buffer = u.read(blockSize)
+                if not buffer:
+                    break
+
+                fileSizeDownloaded += len(buffer)
+                f.write(buffer)
+                status = r"%10d  [%3.2f%%]" % (fileSizeDownloaded, fileSizeDownloaded * 100. / fileSize)
+                status = status + chr(8) * (len(status) + 1)
+                print status,
+
+            f.close()
+
+
+#
+# Main
+#
 
 # Shorthand reference to the namespace.
 wp = parse_wordpress_export
@@ -51,6 +140,7 @@ for post in wp.postsPublished:
 
                 for validDownloadFolder in validDownloadFolders:
                     if link.startswith(validDownloadFolder) or link.startswith('/' + validDownloadFolder) or link.startswith(u'http://' + domain + '/' + validDownloadFolder):
+                        link = makeRelativeLink(link)
                         links.add(link)
 
                 # Catch‐all
@@ -63,33 +153,40 @@ for post in wp.postsPublished:
         except Exception:
             print u'\tError with image source in post with id ' + post['id'] + ': ' + unicode(linkSoup)
         if link.startswith(u'http://' + domain) or link.startswith(u'http://www.' + domain) or (not link.startswith(u'http')):
-
+                link = makeRelativeLink(link)
                 images.add(link)
+
+# Get the attachment links
+for attachmentElement in wp.attachments:
+    attachmentURL = attachmentElement.find(wp.ns3AttachmentURL)
+    link = attachmentURL.text
+    link = makeRelativeLink(link)
+    attachments.add(link)
 
 numImages = len(images)
 numLinks = len(links)
+numAttachments = len(attachments)
 
-print '\nFound %d local images and %d links to local assets.\n' % (numImages, numLinks)
-
-# Get links from any static content files
-# TODO
-
-# print u"Images (<img src='…'>)"
-# print u"====================\n"
-
-# print images
-
-# print "\n===\n"
+print '\nFound %d local images, %d attachments, and %d links to local assets.\n' % (numImages, numAttachments, numLinks)
 
 
-# print u"Links (<a href='…'>)"
-# print u"====================\n"
+#
+# Create the folders and download the files
+#
+if dryRun:
+    print '\nDry run… no actual downloads will take place.\n'
 
-# print links
+print 'Downloading images…\n'
 
-# print "\n===\n"
+for image in images:
+     download(image)
 
-# print "\n============\n"
+print '\nDownloading attachments…\n'
 
-# for link in allLinks:
-#     print link
+for attachment in attachments:
+    download(attachment)
+
+print '\nDownloading other local links…\n'
+
+for link in links:
+    download(link)

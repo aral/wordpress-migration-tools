@@ -140,9 +140,13 @@ ns3CommentApproved = '{%s}comment_approved' % ns3
 ns3CommentType = '{%s}comment_type' % ns3
 ns3CommentParent = '{%s}comment_parent' % ns3
 
+# Attachments
+ns3AttachmentURL = '{%s}attachment_url' % ns3
 
 postStatusTypes = {}
 postCounts = {'draft': 0, 'published': 0}
+
+# numWords = 0
 
 
 def publishedPostIndexForPostID(postID):
@@ -159,6 +163,7 @@ def publishedPostWithID(postID):
 
 
 def parse():
+    # global numWords
 
     print 'Parsing the Wordpress export…'
 
@@ -231,6 +236,10 @@ def parse():
             # comment['authorIP'] = commentElement.find(ns3CommentAuthorIP).text
             comment['date'] = commentElement.find(ns3CommentDateGMT).text
             comment['content'] = commentElement.find(ns3CommentContent).text
+
+            words = comment['content'].split(' ')
+            numWords += len(words)
+
             comment['approved'] = commentElement.find(ns3CommentApproved).text
             comment['type'] = commentElement.find(ns3CommentType).text
             comment['parent'] = commentElement.find(ns3CommentType).text
@@ -261,3 +270,4 @@ def parse():
 
     # Info: number of posts in each status type
     print 'There are %d published, %d draft, and %d private posts.' % (len(postsPublished), len(postsDraft), len(postsPrivate))
+    # print 'Total words in posts: %d' % numWords
