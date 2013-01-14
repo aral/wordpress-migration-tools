@@ -3,6 +3,8 @@ WordPress Migration Tools
 
 These are the scripts I wrote to migrate my Wordpress blog to a static site and create an archive of the old posts (so I don’t break the Interwebs by orphaning URLs).
 
+You can [see the generated archive and posts](http://aralbalkan.com/archive) on my site, [aralbalkan.com](http://aralbalkan.com).
+
 You might find this useful to refer to if you want to do the same thing.
 
 The scripts are not entirely generic (I wrote them to scratch my own itch) although it is not difficult to modify them for your own purposes.
