@@ -61,6 +61,7 @@
 #   TODO
 
 import xml.etree.ElementTree as ET
+import cgi
 
 #
 # Options
@@ -200,6 +201,12 @@ def parse():
         post = {}
 
         post['title'] = postElement.find('title').text
+
+        if post['title'] == None:
+            post['title'] = 'Untitled'
+
+        post['title'] = cgi.escape(post['title'])
+
         post['link'] = postElement.find('link').text
         post['pubDate'] = postElement.find('pubDate').text
         post['creator'] = postElement.find(dcCreator).text
@@ -238,7 +245,7 @@ def parse():
             comment['content'] = commentElement.find(ns3CommentContent).text
 
             words = comment['content'].split(' ')
-            numWords += len(words)
+            # numWords += len(words)
 
             comment['approved'] = commentElement.find(ns3CommentApproved).text
             comment['type'] = commentElement.find(ns3CommentType).text

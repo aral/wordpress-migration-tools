@@ -168,7 +168,7 @@ print 'Downloading images…\n'
 for image in images:
      download(image)
 
-print '\nDownloading other local links…\n'
+# print '\nDownloading other local links…\n'
 
-for link in links:
-    download(link)
+# for link in links:
+#     download(link)
