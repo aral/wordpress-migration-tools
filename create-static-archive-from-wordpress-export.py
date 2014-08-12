@@ -67,7 +67,7 @@ print '\nCreate static archive from WordPress export file:' \
 
 # Generate a static pages
 
-wp.parse()
+wp.parse(args.wordpressExportFile)
 
 print '\nCreating the posts…\n'
 
@@ -81,7 +81,7 @@ currentIndexYear = 0
 coveredYears = []
 
 # Load the post template
-postTemplateFile = open('templates/post-template.html', 'r')
+postTemplateFile = open(args.targetFolder + '/templates/post-template.html', 'r')
 postTemplate = unicode(postTemplateFile.read(), 'utf_8')
 postTemplateFile.close()
 

@@ -163,12 +163,12 @@ def publishedPostWithID(postID):
     return postsPublished[publishedPostIndex]
 
 
-def parse():
+def parse(fileToParse):
     # global numWords
 
     print 'Parsing the Wordpress export…'
 
-    wordpressExportTree = ET.parse('aralbalkan.wordpress.2013-01-08.xml')
+    wordpressExportTree = ET.parse(fileToParse)
     root = wordpressExportTree.getroot()
 
     print 'Done.\n'
