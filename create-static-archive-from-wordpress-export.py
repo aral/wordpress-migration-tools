@@ -57,7 +57,7 @@ parser = argparse.ArgumentParser(
     epilog='Made with love by Aral Balkan (http://aralbalkan.com)')
 
 parser.add_argument('wordpressExportFile')
-parser.add_argument('buildFolder', nargs='?', default='build')
+parser.add_argument('targetFolder', nargs='?', default='.', help='The target folder to use. This is where the build folder will be created and where we will look for the /spam, /static, /templates/, and /fixes folders.')
 # parser.add_argument('--verbose')
 args = parser.parse_args()
 
@@ -110,7 +110,7 @@ for post in wp.postsPublished:
     # You can test this with post
 
     spamCommentIDs = set()
-    spamFilePath = 'spam/%s.html' % post['id']
+    spamFilePath = args.targetFolder + '/spam/%s.html' % post['id']
     if os.path.exists(spamFilePath):
         print '\tInfo: Applying comment spam filter for post with id %s.' % post['id']
         spamFile = open(spamFilePath, 'r')
@@ -169,7 +169,7 @@ for post in wp.postsPublished:
     # line to substitute
     # ...
     #
-    fixesFilePath = 'fixes/%s.html' % post['id']
+    fixesFilePath = args.targetFolder + '/fixes/%s.html' % post['id']
     if os.path.exists(fixesFilePath):
         print '\tInfo: applying manual fixes for post with id %s.' % post['id']
         fixesFile = open(fixesFilePath, 'r')
@@ -185,8 +185,9 @@ for post in wp.postsPublished:
             textToFind = unicode(fixesFile.readline(), 'utf_8')
 
     # Check if the is static content to substitute for this post (if so, we will )
-    staticContentFilePath = 'static/%s.html' % post['id']
+    staticContentFilePath = args.targetFolder + '/static/%s.html' % post['id']
     if os.path.exists(staticContentFilePath):
+        print '\tInfo: applying static content substitute for post with id %s.' % post['id']
         staticContentFile = open(staticContentFilePath, 'r')
         staticContent = unicode(staticContentFile.read(), 'utf_8')
         post['content'] = staticContent
@@ -318,7 +319,7 @@ for post in wp.postsPublished:
     #
     # Create a folder based on the ID and save the HTML in an index.html file.
     #
-    postFolder = args.buildFolder + '/' + post['id']
+    postFolder = args.targetFolder + '/build/' + post['id']
     if not os.path.exists(postFolder):
         os.makedirs(postFolder)
 
@@ -388,13 +389,13 @@ for indexYear in indexYears:
     indexPostListHTML += '</ul>\n'
 
 # Load the index template.
-indexTemplateFile = open('templates/index-template.html', 'r')
+indexTemplateFile = open(args.targetFolder + '/templates/index-template.html', 'r')
 indexTemplate = unicode(indexTemplateFile.read(), 'utf_8')
 indexTemplateFile.close()
 
 archiveIndexHTML = indexTemplate.replace(u'{{POST_LIST}}', indexPostListHTML)
 
-archiveFolder = args.buildFolder + '/archive'
+archiveFolder = args.targetFolder + '/build/archive'
 if not os.path.exists(archiveFolder):
     os.makedirs(archiveFolder)
 
