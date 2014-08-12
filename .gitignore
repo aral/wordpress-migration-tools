@@ -1,4 +1,6 @@
 aralbalkan.wordpress.2013-01-08.xml
+aws-routing-rules.xml
+build-asset-folders
 build/
 *.pyc
 .DS_Store
