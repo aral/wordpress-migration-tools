@@ -57,7 +57,8 @@ parser = argparse.ArgumentParser(
     epilog='Made with love by Aral Balkan (http://aralbalkan.com)')
 
 parser.add_argument('wordpressExportFile')
-parser.add_argument('--verbose')
+parser.add_argument('buildFolder', nargs='?', default='build')
+# parser.add_argument('--verbose')
 args = parser.parse_args()
 
 print '\nCreate static archive from WordPress export file:' \
@@ -317,7 +318,7 @@ for post in wp.postsPublished:
     #
     # Create a folder based on the ID and save the HTML in an index.html file.
     #
-    postFolder = 'build/' + post['id']
+    postFolder = args.buildFolder + '/' + post['id']
     if not os.path.exists(postFolder):
         os.makedirs(postFolder)
 
@@ -393,7 +394,7 @@ indexTemplateFile.close()
 
 archiveIndexHTML = indexTemplate.replace(u'{{POST_LIST}}', indexPostListHTML)
 
-archiveFolder = 'build/archive'
+archiveFolder = args.buildFolder + '/archive'
 if not os.path.exists(archiveFolder):
     os.makedirs(archiveFolder)
 
